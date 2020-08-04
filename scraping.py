@@ -1,12 +1,8 @@
-# Import Splinter and BeautifulSoup
+# Import Splinter, BeautifulSoup, and Pandas
 from splinter import Browser
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup as soup
 import pandas as pd
 import datetime as dt
-
-# Set the executable path and initialize the chrome browser in splinter
-executable_path = {'executable_path': 'chromedriver'}
-browser = Browser('chrome', **executable_path)
 
 def scrape_all():
     # Initiate headless driver for deployment
@@ -26,6 +22,7 @@ def scrape_all():
     # Stop webdriver and return data
     browser.quit()
     return data
+
 
 def mars_news(browser):
 
@@ -53,8 +50,6 @@ def mars_news(browser):
         return None, None
 
     return news_title, news_p
-
-# ### JPL Space Images Featured Image
 
 def featured_image(browser):
     # Visit URL
@@ -87,8 +82,6 @@ def featured_image(browser):
 
     return img_url
 
-# ## Mars Facts
- 
 def mars_facts():
     # Add try/except for error handling
     try:
@@ -97,12 +90,15 @@ def mars_facts():
 
     except BaseException:
         return None
-    
+
     # Assign columns and set index of dataframe
     df.columns=['Description', 'Mars']
     df.set_index('Description', inplace=True)
-    
+
     # Convert dataframe into HTML format, add bootstrap
-    return df.to_html()
- 
-browser.quit()
+    return df.to_html(classes="table table-striped")
+
+if __name__ == "__main__":
+
+    # If running as script, print scraped data
+    print(scrape_all())
