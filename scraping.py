@@ -17,6 +17,7 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
+        "MarsHemispherePicture": MarsHemiPics(browser),
         "last_modified": dt.datetime.now()
     }
 
@@ -98,6 +99,33 @@ def mars_facts():
 
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html(classes="table table-striped")
+    
+def MarsHemiPics(browser):
+    CerbUrl = 'https://astrogeology.usgs.gov/search/map/Mars/Viking/cerberus_enhanced'
+    SchiUrl = 'https://astrogeology.usgs.gov/search/map/Mars/Viking/schiaparelli_enhanced'
+    SyrtisUrl = 'https://astrogeology.usgs.gov/search/map/Mars/Viking/syrtis_major_enhanced'
+    VallesUrl = 'https://astrogeology.usgs.gov/search/map/Mars/Viking/valles_marineris_enhanced'
+    HemiList = [CerbUrl, SchiUrl ,SyrtisUrl,VallesUrl]
+    HemiBaseUrl = 'https://astrogeology.usgs.gov'
+    MarsHemisphere = {}
+    MarsHemisphereList = []
+    for site in HemiList:
+        browser.visit(site)
+        html = browser.html
+        HemiData = soup(html, 'html.parser')
+        HemiTitle = HemiData.find("h2", class_='title').get_text()
+        #Find image URL
+        try:
+            img_url_rel = HemiData.select_one('img.wide-image').get('src')
+        except AttributeError:
+            return None
+        HemiFullUrl = f'{HemiBaseUrl}{img_url_rel}'
+        MarsHemisphere = {
+                "img_url": HemiFullUrl,
+                "title": HemiTitle
+            }
+        MarsHemisphereList.append(MarsHemisphere)
+    return MarsHemisphereList
 
 if __name__ == "__main__":
 
